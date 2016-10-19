@@ -10,11 +10,11 @@
 %table#movies
   %thead
     %tr
-      %th %th{:class => 'title' ? 'hilite' : ''}
-        = link_to 'Movie Title', movies_path(:sort=>'title', :ratings=>params[:ratings])
+      %th{:class => session[:savedSortVal]=='title' ? 'hilite' : ''}
+        = link_to 'Movie Title', movies_path(:sort=>'title',:ratings=>params[:ratings]), {:id=>'title_header'}
       %th Rating
-      %th {:class => 'release_date' ? 'hilite' : ''}
-        = link_to 'Release Date', movies_path(:sort=>'release_date', :ratings=>params[:ratings])
+      %th{:class => session[:savedSortVal]=='release_date' ? 'hilite' : ''}
+        = link_to 'Release Date', movies_path(:sort=>'release_date',:ratings=>params[:ratings]), {:id=>'release_date_header'}
       %th More Info
   %tbody
     - @movies.each do |movie|
@@ -25,3 +25,10 @@
         %td= link_to "More about #{movie.title}", movie_path(movie)
 
 = link_to 'Add new movie', new_movie_path
+
+-#= debug(@selectedRatings)
+-#= debug(@movies)
+-#= debug(@selectedRatings)
+-if !session[:savedSortVal].nil?
+  = debug(session[:savedSortVal])
+=debug(@sort)
