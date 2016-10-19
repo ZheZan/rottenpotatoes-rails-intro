@@ -11,16 +11,42 @@ class MoviesController < ApplicationController
   end
 
   def index
+    @movies = Movie.all
     @all_ratings = ['G', 'PG', 'PG-13', 'R']
-    if params[:title_sort] == "on"
-       @movies = Movie.order("title asc")
-       @movie_highlight = "hilite"
-     elsif params[:date_sort] == "on"
-       @movies = Movie.order("release_date asc")
-       @date_highlight = "hilite"
-    else
-       @movies = Movie.all
+    @sort = params[:sort]
+    @selectedRatings = params[:ratings]
+
+    if (@sort!=nil && @selectedRatings!={})
+      flash.keep
+      @movies =  Movie.where(:rating => @selectedRatings.keys).order(@sort + ' ASC')
     end
+ 
+    if @selectedRatings!=nil
+      session[:savedRatings] = @selectedRatings
+      if (session[:savedSortVal]!=nil)
+        @movies = Movie.where(:rating => @selectedRatings.keys).order(session[:savedSortVal] + ' ASC')
+      else
+        @movies = Movie.where(:rating => @selectedRatings.keys)
+      end
+    else
+      @selectedRatings = {}
+    end
+
+  if @sort!=nil
+    session[:savedSortVal] = @sort
+  if @selectedRatings!={}
+      @movies = Movie.where(:rating => @selectedRatings.keys).order(@sort + ' ASC')
+  else
+      @movies = Movie.order(@sort + ' ASC')
+  end
+  end
+
+    if (@sort==nil && @selectedRatings=={} && (session[:savedSortVal]!=nil or session[:savedRatings]!=nil))
+      flash.keep
+      redirect_to movies_path(:sort => session[:savedSortVal], :ratings => session[:savedRatings])
+    end
+
+    @movies
   end
 
   def new
